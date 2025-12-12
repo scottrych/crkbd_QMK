@@ -58,7 +58,7 @@ enum new_keys {
 #define TWO_TOGGLE LT(1, KC_W) // dummy initialization
 #define ESC_ALT MT(MOD_LALT, KC_ESC)
 #define HOME_LCTL MT(MOD_LCTL, KC_HOME) // Double Tap: SCROLL_LAYER
-#define END_SHIFT MT(MOD_LSFT, KC_END) // Double Tap: CAPS_LOCK
+#define END_SHIFT MT(MOD_LSFT, KC_END) // Double Tap: CAPS_WORD
 
 
 #if MY_UNICODE_ENABLE
@@ -882,6 +882,17 @@ combo_t key_combos[] = {
 //    |  NEW KEY BEHAVIOUR  |
 //    %---------------------%
 
+// Per-key tapping term for cluster keys
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case HOME_LCTL:
+        case END_SHIFT:
+            return 100;  // Faster tapping term for cluster keys
+        default:
+            return TAPPING_TERM;
+    }
+}
+
 // for cap lock
 static deferred_token my_token = INVALID_DEFERRED_TOKEN;
 uint32_t kc_end_callback(uint32_t trigger_time, void *cb_arg) {
@@ -950,14 +961,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         ///// ---------------------
 
-        case END_SHIFT: // toggle caps lock
+        case END_SHIFT: // toggle caps word
 
             if (record->event.pressed && record->tap.count) {
                 if (record->tap.count == 1) {
-                    my_token = defer_exec(175, kc_end_callback, NULL);
+                    my_token = defer_exec(100, kc_end_callback, NULL);
                 } else {
                     cancel_deferred_exec(my_token);
-                    tap_code(KC_CAPS);
+                    caps_word_on();
                 }
                 return false;
             }
@@ -971,7 +982,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 static bool toggle_scroll_layer = false;
                 if (record->event.pressed && record->tap.count) {
                     if (record->tap.count == 1) {
-                        my_token1 = defer_exec(175, kc_home_callback, NULL);
+                        my_token1 = defer_exec(100, kc_home_callback, NULL);
                     } else {
                         cancel_deferred_exec(my_token1);
                         if (!toggle_scroll_layer){

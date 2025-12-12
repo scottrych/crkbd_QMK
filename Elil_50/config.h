@@ -11,6 +11,14 @@ SPDX-License-Identifier: GPL-2.0-or-later
 #pragma once
 
 #define MASTER_LEFT
+#undef DEBOUNCE
+#define DEBOUNCE 3
+
+#define TAPPING_TERM 150
+#define QUICK_TAP_TERM 0
+
+#define HOLD_ON_OTHER_KEY_PRESS
+#define PERMISSIVE_HOLD
 
 #define MK_3_SPEED
 #define TAPPING_TOGGLE 1
